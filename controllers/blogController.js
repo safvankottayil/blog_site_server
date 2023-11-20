@@ -1,16 +1,17 @@
 const BlogSchema = require("../model/blogModel");
 const cloudnery = require("../config/cloudnery");
 const fs = require("fs");
+const { log } = require("console");
 
 module.exports = {
   GetHomepage: async (req, res) => {
     try {
-        const blog= await BlogSchema.find({},{title:1,image:1}).sort({_id:-1}).limit(3)
-        console.log();
-        res.json({blog,status:true})
-    }catch(err) {
-
-    }
+      const blog = await BlogSchema.find({}, { title: 1, image: 1 })
+        .sort({ _id: -1 })
+        .limit(3);
+      console.log();
+      res.json({ blog, status: true });
+    } catch (err) {}
   },
   AddBlog: async (req, res) => {
     try {
@@ -102,16 +103,45 @@ module.exports = {
       }
     } catch (err) {}
   },
-  GetAllblogs:async(req,res)=>{
-    try{
-      const {page}= req.params
-      const skip=(page-1)*9
-      const length=await BlogSchema.find().count()
-      const pages=Math.floor(length/9)
-     const blogs=await BlogSchema.find().sort({_id:-1}).skip(skip).limit(9)
-     res.json({status:true,pages,blogs})
-    }catch(err){
-
-    }
-  }
+  GetAllblogs: async (req, res) => {
+    try {
+      const { page } = req.params;
+      const skip = (page - 1) * 9;
+      const length = await BlogSchema.find().count();
+      const pages = Math.floor(length / 9);
+      const blogs = await BlogSchema.find()
+        .sort({ _id: -1 })
+        .skip(skip)
+        .limit(9);
+      res.json({ status: true, pages, blogs });
+    } catch (err) {}
+  },
+  AddRating: async (req, res) => {
+    const User = req.User;
+    const { id, rate } = req.params;
+    const data = await BlogSchema.updateOne(
+      { _id: id },
+      {
+        $inc: { rating: rate },
+        $push: { ratings: { User: User._id, rate: rate } },
+      }
+    );
+    console.log(data);
+    res.json({ status: true });
+  },
+  Israted: async (req, res) => {
+    try {
+      const User = req.User;
+      const { id } = req.params;
+      const data = await BlogSchema.findOne({
+        _id: id,
+        "ratings.User": User._id,
+      });
+      if (data) {
+        res.json({ status: true });
+      } else {
+        res.json({ status: false });
+      }
+    } catch (err) {}
+  },
 };

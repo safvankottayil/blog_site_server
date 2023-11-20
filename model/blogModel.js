@@ -8,6 +8,19 @@ const BlogSchema=new mongoose.Schema({
         type:String,
         required:true
     },
+    rating:{
+     type:Number,
+     default:0
+    },
+    ratings:[{
+        User:{
+            type:mongoose.Schema.Types.ObjectId,
+            ref:'users'
+        },
+        rate:{
+            type:Number,
+        }
+    }],
     title:{
         type:String,
         required:true
