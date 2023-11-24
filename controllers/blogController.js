@@ -2,6 +2,8 @@ const BlogSchema = require("../model/blogModel");
 const cloudnery = require("../config/cloudnery");
 const fs = require("fs");
 const { log } = require("console");
+const mongoose = require("mongoose");
+const ObjectId = mongoose.Types.ObjectId;
 
 module.exports = {
   GetHomepage: async (req, res) => {
@@ -132,11 +134,27 @@ module.exports = {
   Israted: async (req, res) => {
     try {
       const User = req.User;
+      console.log();
       const { id } = req.params;
+      console.log(id);
       const data = await BlogSchema.findOne({
         _id: id,
         "ratings.User": User._id,
       });
+      const x = await BlogSchema.aggregate([
+        {$project:{rating:1,ratings:1}},
+        {
+         
+          $match: {
+            _id: new ObjectId(id),
+          },
+        },
+        
+        // { $unwind: "$ratings" },
+        // { $match: { "ratings.User": new ObjectId(User._id) } },
+      ]);
+      console.log(x);
+      console.log(data);
       if (data) {
         res.json({ status: true });
       } else {

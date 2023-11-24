@@ -1,6 +1,7 @@
 const users = require("../model/user");
 const bcrypt = require("bcrypt");
 const { GeneratToken } = require("../middlewere/auth");
+const jwt =require('jsonwebtoken')
 const saltRounds = 10;
 async function bycryptPassword(password) {
   try {
@@ -31,10 +32,11 @@ module.exports = {
       const { email, password } = req.body;
       const result = await users.findOne({ email: email });
       if (result) {
+        console.log(result);
         const chekpassword = await bcrypt.compare(password, result.password);
         console.log(chekpassword);
         if (chekpassword) {
-          const token = GeneratToken(result, "user");
+          const token = GeneratToken({_id:result._id,email:result.email,password:result.password}, "user");
           res.json({ status: true, token });
         } else {
           res.json({ status: false, type: "password" });

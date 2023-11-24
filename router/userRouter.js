@@ -11,7 +11,7 @@ router.route('/addblog').post(upload.single('image'),AddBlog).patch(upload.singl
 router.get('/addblogs/:id',verfyToken,Getblog)
 router.get('/previesblog',prevesBlog)
 router.get('/blogs/:page',GetAllblogs)
-router.get('/blog/addrating/:id/:rate',verfyToken,AddRating)
+router.post('/blog/addrating/:id/:rate',verfyToken,AddRating)
 router.get('/blog/israted/:id',verfyToken,Israted)
 
 module.exports=router
